@@ -1,0 +1,7 @@
+{
+  "name": "simplyorder-pwa",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
