@@ -208,6 +208,7 @@ export default {
     const baseUrl = BASE_URL;
     const amountToRemove = ref(Number.parseInt(props.article!.amount) > 0 ? 1 : 0);
     const isStockModalOpen = ref(false);
+    const customerNumber = localStorage.getItem('customerNumber');
 
     const increaseAmount = () => {
       if (amountToRemove.value < Number.parseInt(props.article!.amount)) {
@@ -229,9 +230,9 @@ export default {
     };
 
     const updateStock = async (newAmount: string) => {
-      await ApiService.changeAmount(props.article!.articleNumber, newAmount);
+      await ApiService.changeAmount(customerNumber!, props.article!.articleNumber, newAmount);
       props.article!.amount = newAmount;
-      const criticalItems = await ApiService.getCriticalItems();
+      const criticalItems = await ApiService.getCriticalItems(customerNumber!);
       localStorage.setItem('criticalItems', JSON.stringify(criticalItems.criticalStock));
       closeModal();
     }

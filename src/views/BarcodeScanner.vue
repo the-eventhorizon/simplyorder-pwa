@@ -183,7 +183,7 @@ export default {
       console.log(deviceId);
 
       try {
-        await codeReader.decodeFromVideoDevice(deviceId, video.value, (result) => {
+        await codeReader.decodeFromVideoDevice(null, video.value!, (result) => {
           if (result) {
             scannedBarcode.value = result.getText();
             submitBarcode(scannedBarcode.value);
@@ -206,6 +206,9 @@ export default {
         codeReader.reset();
         isCameraActive.value = false;
         scannedBarcode.value = "";
+        const stream = video.value!.srcObject as MediaStream | null;
+        stream?.getTracks().forEach(track => track.stop());
+        video.value!.srcObject = null;
       }
     }
 
@@ -224,11 +227,13 @@ export default {
         } else {
           alert("Keinen Artikel mit der EAN " + barcode + " gefunden.");
           await stopScan();
+          await new Promise(r => setTimeout(r, 500)); // small delay to avoid issues on some devices
           await startScan();
         }
       } catch (error) {
         console.error("Error finding article:", error);
         await stopScan();
+        await new Promise(r => setTimeout(r, 500)); // small delay to avoid issues on some devices
         await startScan();
       }
     }
@@ -257,8 +262,10 @@ export default {
     }
 
     async function checkPermissions() {
-      const status = await navigator.mediaDevices.getUserMedia({video: true}).catch(() => null);
-      if (!status) {
+      if (!navigator.permissions) return;
+
+      const status = await navigator.permissions.query({name: 'camera' as PermissionName});
+      if (status.state === 'denied') {
         alert("Kamera-Zugriff verweigert. Bitte erlauben Sie den Zugriff auf die Kamera.");
       }
     }

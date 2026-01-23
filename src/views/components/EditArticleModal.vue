@@ -209,6 +209,7 @@ export default {
     const articleAmount = ref(Number.parseInt(props.article!.amount));
     const updatedArticle = ref({...props.article!});
     const canViewPrices = JSON.parse(localStorage.getItem('userRights')!).some((right: any) => right.id === 17);
+    const customerNumber = localStorage.getItem('customerNumber');
 
     watch(() => props.article!, (newArticle) => {
       updatedArticle.value = {...newArticle}
@@ -233,10 +234,10 @@ export default {
         alert("Nicht genügend Bestand vorhanden.");
         return;
       }
-      await ApiService.reduceAmount(props.article!.articleNumber, amountToRemove.value);
+      await ApiService.reduceAmount(customerNumber!, props.article!.articleNumber, amountToRemove.value);
       articleAmount.value -= amountToRemove.value;
       updatedArticle.value.amount = articleAmount.value.toString();
-      const criticalItems = await ApiService.getCriticalItems();
+      const criticalItems = await ApiService.getCriticalItems(customerNumber!);
       localStorage.setItem('criticalItems', JSON.stringify(criticalItems.criticalStock));
       emit("updateArticle", updatedArticle.value);
       emit("openSuccess");

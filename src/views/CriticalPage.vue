@@ -220,7 +220,7 @@ export default {
       if (index !== -1) {
         articles.value[index] = updatedArticle;
         selectedArticle.value = updatedArticle;
-        const number = await ApiService.getCriticalItems();
+        const number = await ApiService.getCriticalItems(customerNumber!);
         localStorage.setItem('criticalItems', JSON.stringify(number.criticalStock));
         criticalItems.value = localStorage.getItem('criticalItems')!;
         await fetchArticles()

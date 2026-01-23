@@ -276,6 +276,7 @@ export default {
     const minAmount = ref(Number.parseInt(props.article!.minAmount));
     const updatedArticle = ref({...props.article!});
     const history = ref([]);
+    const customerNumber = localStorage.getItem('customerNumber')
 
     watch(() => props.article!, (newArticle) => {
       updatedArticle.value = {...newArticle}
@@ -301,14 +302,14 @@ export default {
 
     const updateArticle = async () => {
       if (articleAmount.value != Number.parseInt(props.article!.amount)) {
-        await ApiService.changeAmount(props.article!.articleNumber, articleAmount.value.toString());
+        await ApiService.changeAmount(customerNumber!, props.article!.articleNumber, articleAmount.value.toString());
       }
       if (minAmount.value != Number.parseInt(props.article!.minAmount)) {
-        await ApiService.changeMinAmount(props.article!.articleNumber, minAmount.value.toString());
+        await ApiService.changeMinAmount(customerNumber!, props.article!.articleNumber, minAmount.value.toString());
       }
       updatedArticle.value.amount = articleAmount.value.toString();
       updatedArticle.value.minAmount = minAmount.value.toString();
-      const criticalItems = await ApiService.getCriticalItems();
+      const criticalItems = await ApiService.getCriticalItems(customerNumber!);
       localStorage.setItem('criticalItems', JSON.stringify(criticalItems.criticalStock));
       emit("updateArticle", updatedArticle.value);
       closeModal();
@@ -317,7 +318,7 @@ export default {
     // this is needed later
     const fetchHistory = async () => {
       try {
-        history.value = await ApiService.getEditHistory(props.article!.articleNumber);
+        history.value = await ApiService.getEditHistory(customerNumber!, props.article!.articleNumber);
         history.value.sort((a, b) => new Date(b['datum']).getTime() - new Date(a['datum']).getTime());
         console.log(history.value);
       } catch (error) {

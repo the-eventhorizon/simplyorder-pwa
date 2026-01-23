@@ -154,7 +154,7 @@ export default {
     }
 
     async function fetchRequests() {
-      const result = await ApiService.getRequests();
+      const result = await ApiService.getRequests(customerNumber!);
       requests.value = result;
       localStorage.setItem('requests', JSON.stringify(result));
     }

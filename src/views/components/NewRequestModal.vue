@@ -119,7 +119,7 @@ export default {
     };
 
     const sendRequest = async () => {
-      await ApiService.sendRequest(subject.value, message.value);
+      await ApiService.sendRequest(customerNumber!, subject.value, message.value);
       emit('updateRequests');
       closeModal();
     }
