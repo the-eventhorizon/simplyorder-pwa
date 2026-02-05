@@ -2,9 +2,9 @@
   <MainLayout>
     <!-- Input for USB Scanners -->
     <div id="video-container" v-if="hasCamera" style="display: none">
-      <video ref="video" autoplay playsinline></video>
+      <video id="video" ref="video" autoplay playsinline style="opacity: 0"></video>
       <div class="overlay">
-        <img src="@/assets/images/Scanner.png" alt="QR Code Scanner"/>
+        <img id="scanner-overlay" src="@/assets/images/Scanner.png" alt="QR Code Scanner" style="opacity: 0"/>
       </div>
       <div class="close-button">
         <ion-button fill="clear" @click="$router.back()">
@@ -191,9 +191,11 @@ export default {
           }
         });
         // force autoplay of the video element
-        await video.value!.play().catch(e => console.error('Error playing video:', e));
         document.getElementById('error-container')!.style.display = 'none';
         document.getElementById('video-container')!.style.display = 'block';
+        await video.value!.play().catch(e => console.error('Error playing video:', e));
+        document.getElementById('scanner-overlay')!.style.opacity = '1';
+        document.getElementById('video')!.style.opacity = '1';
       } catch (error) {
         console.error('Web scan error:', error);
         document.getElementById('error-container')!.style.display = 'flex';
@@ -238,7 +240,7 @@ export default {
       }
     }
 
-    function closeModal(modal: string) {
+    async function closeModal(modal: string) {
       switch (modal) {
         case 'edit':
           isEditModalOpen.value = false;
@@ -257,8 +259,9 @@ export default {
       if (isEditModalOpen.value || isSuccessModalOpen.value || isStockModalOpen.value || isDetailsModalOpen.value) {
         return;
       }
-      stopScan();
-      startScan();
+      await stopScan();
+      await new Promise(r => setTimeout(r, 500)); // small delay to avoid issues on some devices
+      await startScan();
     }
 
     async function checkPermissions() {
